@@ -1,0 +1,44 @@
+id: claude-clay
+name: Claude Clay
+version: 1
+source:
+  kind: builtin
+  ref: null
+aspect_default: "16:9"
+style:
+  summary: >
+    Clean minimalist technical illustration on cream paper.
+    Soft rounded boxes, ink arrows, no decoration.
+  label_min_px: 24
+  arrow_px: [2, 3]
+  text_orientation: horizontal
+  contrast_min: 4.5
+palette:
+  background: "#F2EFE6"
+  surface: "#F7F4EA"
+  primary: "#C15F3C"
+  primary_fg: "#FFFFFF"
+  accent: "#F0D584"
+  accent_2: "#E2D8F0"
+  success: "#B6C9A8"
+  ink: "#221E18"
+  muted: "#8A8376"
+roles:
+  title: { bg: surface, fg: ink }
+  node_default: { bg: surface, fg: ink }
+  node_emphasis: { bg: primary, fg: primary_fg }
+  node_success: { bg: success, fg: ink }
+  node_decision: { bg: accent, fg: ink }
+  subgraph: { bg: accent_2, fg: ink }
+  arrow: { stroke: ink }
+negatives:
+  - mermaid or plantuml source syntax
+  - ASCII art
+  - tiny labels
+  - watermarks or logos
+  - node IDs as visible labels
+svg:
+  label_px: [18, 26]
+  max_kb: 30
+  max_kb_small: 15
+  small_node_threshold: 8

@@ -1,0 +1,10 @@
+flowchart LR
+  Source[Diagram source] --> Inventory[Node and edge inventory]
+  Inventory --> Simplify[Editorial simplify]
+  Simplify --> Theme[Resolve theme]
+  Theme --> Prompt[Layout-hints prompt]
+  Prompt --> Escape[Brace policy]
+  Escape --> Imagen[Image worker]
+  Imagen --> Judge{Fidelity judge}
+  Judge -->|fail| Prompt
+  Judge -->|pass| PNG[Finished PNG]

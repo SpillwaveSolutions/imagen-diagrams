@@ -1,0 +1,9 @@
+@startuml
+actor Agent
+participant Skill as "imagen-diagrams"
+participant Backend as "Image backend"
+Agent -> Skill: render figure
+Skill -> Backend: layout-hints prompt
+Backend --> Skill: PNG
+Skill --> Agent: PNG and sidecar
+@enduml

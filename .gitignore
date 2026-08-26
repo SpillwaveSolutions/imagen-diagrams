@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.pytest_cache/
+skills/imagen-diagrams/themes/extracted/*.yaml
+!skills/imagen-diagrams/themes/extracted/.gitkeep

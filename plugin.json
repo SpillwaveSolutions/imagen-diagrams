@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "imagen-diagrams",
+  "version": "0.1.0",
+  "description": "Convert Mermaid and PlantUML into slide and article figures. Themes as YAML. Layout-hints prompt. Fidelity judge. Optional SVG. Claude Clay and Manning Print built in.",
+  "author": {
+    "name": "Rick Hightower",
+    "url": "https://github.com/RichardHightower"
+  },
+  "homepage": "https://github.com/SpillwaveSolutions/imagen-diagrams",
+  "repository": "https://github.com/SpillwaveSolutions/imagen-diagrams",
+  "license": "MIT",
+  "keywords": [
+    "mermaid",
+    "plantuml",
+    "puml",
+    "slidedeck",
+    "slide-diagram",
+    "article-figure",
+    "imagen",
+    "theme",
+    "svg",
+    "publication",
+    "glossary",
+    "ste100",
+    "claude-code",
+    "grok-build",
+    "codex",
+    "cursor",
+    "agent-plugins"
+  ]
+}

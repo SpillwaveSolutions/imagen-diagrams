@@ -1,0 +1,49 @@
+id: manning-print
+name: Manning Print
+version: 1
+source:
+  kind: builtin
+  ref: null
+aspect_default: "16:9"
+style:
+  summary: >
+    Print-safe greyscale. Black ink, white paper, four greys.
+    Horizontal labels. No clay, no cream.
+  label_min_px: 24
+  arrow_px: [2, 3]
+  text_orientation: horizontal
+  contrast_min: 4.5
+palette:
+  background: "#FFFFFF"
+  surface: "#F2F2F2"
+  primary: "#4A4A4A"
+  primary_fg: "#FFFFFF"
+  accent: "#D9D9D9"
+  accent_2: "#D9D9D9"
+  success: "#5A5A5A"
+  ink: "#111111"
+  muted: "#8C8C8C"
+roles:
+  title: { bg: surface, fg: ink }
+  node_default: { bg: surface, fg: ink }
+  node_emphasis: { bg: primary, fg: primary_fg }
+  node_success: { bg: success, fg: primary_fg }
+  node_decision: { bg: accent, fg: ink }
+  subgraph: { bg: gray_2, fg: ink }
+  arrow: { stroke: ink }
+gray_1: "#F2F2F2"
+gray_2: "#D9D9D9"
+gray_3: "#8C8C8C"
+gray_4: "#4A4A4A"
+negatives:
+  - color fills beyond greyscale
+  - mermaid or plantuml source syntax
+  - ASCII art
+  - tiny labels
+  - watermarks or logos
+  - node IDs as visible labels
+svg:
+  label_px: [18, 26]
+  max_kb: 30
+  max_kb_small: 15
+  small_node_threshold: 8

@@ -1,0 +1,9 @@
+theme: claude-clay
+aspect: "16:9"
+backend: auto          # auto | imagen | grok | codex | imagen-scan
+svg: false
+judge: true
+retries: 2
+publication: true
+input_glob: "**/diagrams/*.{mmd,mermaid,puml,plantuml}"
+output_dir: null
