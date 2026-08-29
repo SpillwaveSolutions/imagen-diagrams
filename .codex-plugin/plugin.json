@@ -1,6 +1,6 @@
 {
   "name": "imagen-diagrams",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Convert Mermaid and PlantUML into slide and article figures. Themes as YAML. Layout-hints prompt. Fidelity judge. Optional SVG.",
   "author": {
     "name": "Rick Hightower",
