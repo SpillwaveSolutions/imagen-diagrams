@@ -106,7 +106,12 @@ def main() -> int:
     if args.dry_run:
         return 0
     try:
-        proc = subprocess.run(cmd, check=False)
+        proc = subprocess.run(
+            cmd,
+            check=False,
+            input=prompt if resolved.name == "imagen" else None,
+            text=resolved.name == "imagen",
+        )
     except FileNotFoundError:
         print(f"backend binary missing: {resolved.binary}", file=sys.stderr)
         return 2

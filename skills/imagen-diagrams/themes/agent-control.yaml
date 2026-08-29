@@ -1,0 +1,48 @@
+id: agent-control
+name: Agent Control
+version: 1
+source:
+  kind: builtin
+  ref: user-supplied agent-control reference
+aspect_default: "16:9"
+style:
+  summary: >
+    White presentation canvas with crisp deep-navy outlined cards and arrows.
+    Use a restrained orange dashed boundary for tools and a soft green outlined
+    target repository. Prefer simple thin-line symbols only when they clarify
+    a role. Plenty of whitespace. No gradients or shadows.
+  label_min_px: 24
+  arrow_px: [2, 3]
+  text_orientation: horizontal
+  contrast_min: 4.5
+palette:
+  background: "#F8FAFD"
+  surface: "#FFFFFF"
+  primary: "#0B2E6B"
+  primary_fg: "#FFFFFF"
+  accent: "#F97316"
+  accent_2: "#EAF0FF"
+  success: "#2F6B2D"
+  ink: "#0B2E6B"
+  muted: "#667085"
+roles:
+  title: { bg: surface, fg: ink }
+  node_default: { bg: surface, fg: ink }
+  node_emphasis: { bg: primary, fg: primary_fg }
+  node_success: { bg: success, fg: primary_fg }
+  node_decision: { bg: accent, fg: primary_fg }
+  subgraph: { bg: accent_2, fg: ink }
+  arrow: { stroke: ink }
+negatives:
+  - gradients or drop shadows
+  - filled orange cards except a clearly marked tool boundary
+  - mermaid or plantuml source syntax
+  - ASCII art
+  - tiny labels
+  - watermarks or logos
+  - node IDs as visible labels
+svg:
+  label_px: [18, 26]
+  max_kb: 30
+  max_kb_small: 15
+  small_node_threshold: 8
