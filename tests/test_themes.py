@@ -10,7 +10,7 @@ from prompt_builder import load_theme  # noqa: E402
 
 class ThemeTests(unittest.TestCase):
     def test_builtin_themes_load(self):
-        for theme_id in ("claude-clay", "manning-print", "agent-control", "arctic-fox"):
+        for theme_id in ("claude-clay", "manning-print", "agent-control", "arctic-fox", "towards-ai"):
             with self.subTest(theme=theme_id):
                 theme = load_theme(theme_id)
                 self.assertEqual(theme["id"], theme_id)
