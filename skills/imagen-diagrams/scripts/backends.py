@@ -59,14 +59,16 @@ def argv_for(
     backend: ResolvedBackend, prompt_file: str, out_file: str, aspect: str
 ) -> list[str]:
     if backend.name == "imagen":
+        # gemini-imagen 0.6.x accepts a prompt as stdin or a positional argument.
+        # It does not support the prompt-file flag used by Grok and Codex.
+        # render.py pipes the prompt for this branch to avoid putting a long
+        # diagram prompt in the process list.
         return [
             backend.binary,
             "generate",
-            "--prompt-file",
-            prompt_file,
-            "--aspect",
+            "--aspect-ratio",
             aspect,
-            "--output",
+            "-o",
             out_file,
         ]
     if backend.name == "grok":

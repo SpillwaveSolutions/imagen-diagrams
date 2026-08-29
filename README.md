@@ -10,6 +10,8 @@ Hosts: Claude Code, Codex, Grok Build, Cursor, SKILZ / Agent Plugins 1.0.
 
 - **claude-clay**: cream paper, clay, soft yellow, muted lavender, sage, ink arrows.
 - **manning-print**: white paper, black ink, four greys. Print-safe.
+- **agent-control**: white canvas, deep navy cards and arrows, an orange tool boundary, green repository target.
+- **arctic-fox**: white paper, deep navy ink, royal-blue emphasis, silver-grey surfaces.
 
 Add a theme as YAML under `skills/imagen-diagrams/themes/` or `.imagen-diagrams/themes/`. Extract a theme from a URL or an image.
 

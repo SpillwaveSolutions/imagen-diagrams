@@ -32,7 +32,7 @@ Before article, deck, or website work, inspect existing research. Determine thes
 ## Inputs
 
 - Source: `.mmd`, `.mermaid`, fenced mermaid, `.puml`, `.plantuml`, fenced plantuml
-- Theme: `claude-clay`, `manning-print`, a YAML file, or a URL/image to extract
+- Theme: `claude-clay`, `manning-print`, `agent-control`, `arctic-fox`, a YAML file, or a URL/image to extract
 - Density: slide (default 16:9) or article (4:3)
 - Backend: auto unless config pins one
 

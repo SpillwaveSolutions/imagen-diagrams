@@ -1,0 +1,48 @@
+id: arctic-fox
+name: Arctic Fox
+version: 1
+source:
+  kind: builtin
+  ref: Spillwave visual system
+aspect_default: "16:9"
+style:
+  summary: >
+    White paper with deep navy ink, royal-blue emphasis, silver-grey surfaces,
+    and cool restrained spacing. Use sharp, precise technical forms with
+    rounded corners only where they improve scanning. No warm colors,
+    gradients, or decorative texture.
+  label_min_px: 24
+  arrow_px: [2, 3]
+  text_orientation: horizontal
+  contrast_min: 4.5
+palette:
+  background: "#FFFFFF"
+  surface: "#F2F5F9"
+  primary: "#102A56"
+  primary_fg: "#FFFFFF"
+  accent: "#2F6FED"
+  accent_2: "#C8D1DD"
+  success: "#6D7F95"
+  ink: "#102A56"
+  muted: "#5F6F82"
+roles:
+  title: { bg: surface, fg: ink }
+  node_default: { bg: surface, fg: ink }
+  node_emphasis: { bg: primary, fg: primary_fg }
+  node_success: { bg: success, fg: primary_fg }
+  node_decision: { bg: accent, fg: primary_fg }
+  subgraph: { bg: accent_2, fg: ink }
+  arrow: { stroke: ink }
+negatives:
+  - warm palettes
+  - gradients or decorative texture
+  - mermaid or plantuml source syntax
+  - ASCII art
+  - tiny labels
+  - watermarks or logos
+  - node IDs as visible labels
+svg:
+  label_px: [18, 26]
+  max_kb: 30
+  max_kb_small: 15
+  small_node_threshold: 8

@@ -1,13 +1,13 @@
 {
   "name": "imagen-diagrams-marketplace",
   "description": "Optional native Grok marketplace metadata. Grok Build already loads Claude plugins with zero config. This file pins identity for Grok marketplace listings.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "plugins": [
     {
       "name": "imagen-diagrams",
       "source": ".",
-      "description": "Mermaid and PlantUML to slide and article figures. Themes, judge, optional SVG. Claude-compatible.",
-      "version": "0.1.0",
+      "description": "Mermaid and PlantUML to slide and article figures. Four built-in themes, judge, optional SVG. Claude-compatible.",
+      "version": "0.2.0",
       "compatibility": {
         "claude_plugin": true,
         "zero_config": true
