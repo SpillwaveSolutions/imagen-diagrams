@@ -1,0 +1,46 @@
+id: towards-ai
+name: Towards AI
+version: 1
+source:
+  kind: builtin
+  ref: towardsai.net brand tokens
+aspect_default: "16:9"
+style:
+  summary: >
+    Warm paper background with near-black ink and royal-blue emphasis.
+    Clean editorial technical illustration in the Towards AI style. White
+    card surfaces, precise ink arrows, restrained warm-neutral zones.
+    Lettering in a clean geometric sans-serif in the manner of Inter.
+  label_min_px: 24
+  arrow_px: [2, 3]
+  text_orientation: horizontal
+  contrast_min: 4.5
+palette:
+  background: "#F8F7F4"
+  surface: "#FFFFFF"
+  primary: "#003EC7"
+  primary_fg: "#FFFFFF"
+  accent: "#0052FF"
+  accent_2: "#EEECE7"
+  success: "#B8CCB0"
+  ink: "#191C1E"
+  muted: "#6B6E7B"
+roles:
+  title: { bg: surface, fg: ink }
+  node_default: { bg: surface, fg: ink }
+  node_emphasis: { bg: primary, fg: primary_fg }
+  node_success: { bg: success, fg: ink }
+  node_decision: { bg: accent, fg: primary_fg }
+  subgraph: { bg: accent_2, fg: ink }
+  arrow: { stroke: ink }
+negatives:
+  - mermaid or plantuml source syntax
+  - ASCII art
+  - tiny labels
+  - watermarks or logos
+  - node IDs as visible labels
+svg:
+  label_px: [18, 26]
+  max_kb: 30
+  max_kb_small: 15
+  small_node_threshold: 8
