@@ -157,6 +157,9 @@ def build_layout_hints_prompt(
             "No watermarks or logos.",
             "No em dash characters in labels.",
             "Do not expose source notation.",
+            "Do not add a title, heading, caption, or banner text of any kind. "
+            "The source names nodes, never the diagram, so any title would be "
+            "invented. Render only the nodes, edges, and their labels.",
         ]
     )
     layout = "\n".join(

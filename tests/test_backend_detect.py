@@ -18,7 +18,10 @@ class DetectTests(unittest.TestCase):
             resolved = detect_backend("auto")
         self.assertIsNotNone(resolved)
         self.assertEqual(resolved.name, "imagen")
-        self.assertEqual(resolved.policy, "imagen-cli-vars")
+        # Changed deliberately: the old default doubled braces, which the
+        # imagen CLI reads as a Jinja variable. See DefaultPolicyTests in
+        # test_brace_policy.py for the label that breaks under doubling.
+        self.assertEqual(resolved.policy, "imagen-cli-bracket")
 
     def test_auto_falls_to_grok(self):
         def which(name):
