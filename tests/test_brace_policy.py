@@ -46,3 +46,60 @@ class BracePolicyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DefaultPolicyTests(unittest.TestCase):
+    """A plain identifier in braces is the case that breaks under doubling.
+
+    `skill://{name}` becomes `{{name}}`, which Jinja reads as a required
+    variable, and the imagen CLI exits with "Missing required variables: name".
+    A label that is not a valid identifier, such as `{Where is your value?}`,
+    survives doubling, which is why the bug hides until one diagram uses a
+    single plain word.
+    """
+
+    def test_imagen_default_is_scan(self):
+        from backends import POLICY_FOR
+        self.assertEqual(POLICY_FOR["imagen-scan"], "imagen-cli-scan")
+
+    def test_identifier_label_is_inert_under_default(self):
+        out = escape_for_backend("skill://{name}", "imagen-cli-scan")
+        self.assertEqual(out, "skill://(name)")
+        self.assertNotIn("{{", out)
+
+    def test_vars_policy_still_reachable(self):
+        from backends import POLICY_FOR
+        self.assertEqual(POLICY_FOR["imagen-vars"], "imagen-cli-vars")
+
+
+class BracketPolicyTests(unittest.TestCase):
+    """Mermaid's hexagon node is what defeats every pairing policy.
+
+    `N{{hexagon}}` has a nested pair. Under `imagen-cli-scan` the inner pair
+    matches first, producing `N({hexagon)}`, which still carries a brace and
+    still reaches Jinja. Only an unconditional replacement is total.
+    """
+
+    CASES = (
+        ("skill://{name}", "skill://[name]"),
+        ("N{{hexagon label}}", "N[[hexagon label]]"),
+        ("J{Decision?}", "J[Decision?]"),
+        ('X{{"payload skills=[\'/skills/\']"}', 'X[["payload skills=[\'/skills/\']"]'),
+    )
+
+    def test_no_brace_survives(self):
+        for src, want in self.CASES:
+            with self.subTest(src=src):
+                out = escape_for_backend(src, "imagen-cli-bracket")
+                self.assertEqual(out, want)
+                self.assertNotIn("{", out)
+                self.assertNotIn("}", out)
+
+    def test_scan_leaves_a_brace_on_the_hexagon(self):
+        # The regression this default exists to prevent.
+        out = escape_for_backend("N{{hexagon label}}", "imagen-cli-scan")
+        self.assertIn("{", out)
+
+    def test_imagen_default_is_bracket(self):
+        from backends import POLICY_FOR
+        self.assertEqual(POLICY_FOR["imagen"], "imagen-cli-bracket")
