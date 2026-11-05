@@ -9,7 +9,7 @@ from backends import ResolvedBackend, argv_for  # noqa: E402
 
 
 class BackendArgvTests(unittest.TestCase):
-    def test_imagen_uses_stdin_compatible_flags(self):
+    def test_imagen_reads_prompt_file(self):
         backend = ResolvedBackend("imagen", "imagen-cli-vars", "/usr/bin/imagen")
         argv = argv_for(backend, "prompt.txt", "figure.png", "16:9")
         self.assertEqual(
@@ -17,13 +17,14 @@ class BackendArgvTests(unittest.TestCase):
             [
                 "/usr/bin/imagen",
                 "generate",
+                "--prompt-file",
+                "prompt.txt",
                 "--aspect-ratio",
                 "16:9",
                 "-o",
                 "figure.png",
             ],
         )
-        self.assertNotIn("--prompt-file", argv)
 
 
 if __name__ == "__main__":

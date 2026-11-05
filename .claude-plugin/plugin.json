@@ -1,22 +1,14 @@
 {
   "name": "imagen-diagrams",
-  "version": "0.3.0",
-  "description": "Convert Mermaid and PlantUML into slide and article figures. Themes as YAML. Layout-hints prompt. Fidelity judge. Optional SVG.",
+  "version": "1.0.1",
+  "description": "Turn Mermaid and PlantUML into themed slide and article figures. Image backend with failover, fidelity judge, and a code-drawn SVG path that works with no image API at all.",
   "author": {
     "name": "Rick Hightower",
-    "url": "https://github.com/RichardHightower"
+    "email": "rick@spillwave.com",
+    "url": "https://spillwave.com"
   },
   "homepage": "https://github.com/SpillwaveSolutions/imagen-diagrams",
   "repository": "https://github.com/SpillwaveSolutions/imagen-diagrams",
   "license": "MIT",
-  "keywords": [
-    "mermaid",
-    "plantuml",
-    "slidedeck",
-    "article-figure",
-    "imagen",
-    "theme",
-    "svg",
-    "claude-code"
-  ]
+  "keywords": ["mermaid", "plantuml", "slide-figure", "article-figure", "theme", "svg", "nano-banana"]
 }

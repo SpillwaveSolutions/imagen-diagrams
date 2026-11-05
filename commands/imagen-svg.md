@@ -1,9 +1,5 @@
 ---
-description: Translate a passing PNG into a raw SVG that still matches the source inventory.
+description: Produce a raw themed SVG for a diagram and gate it.
 ---
 
-Run `skills/imagen-diagrams/scripts/to_svg.py` only after the fidelity judge passes.
-
-PNG is the visual spec. Source is structure of record. Do not translate a failing PNG.
-
-Mechanical gate: well-formed XML, first char `<`, last `</svg>`, no raster embed, no animation, size budget 30 KB (15 KB if 8 nodes or fewer), real text nodes at least half the source node count.
+Load the imagen-diagrams skill and follow its Code-drawn SVG path. Use a passing PNG as the visual spec when one exists. Gate with to_svg.py --strict-labels and check the PNG preview before delivering.

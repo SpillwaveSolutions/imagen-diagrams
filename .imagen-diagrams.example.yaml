@@ -1,6 +1,7 @@
 theme: claude-clay
 aspect: "16:9"
-backend: auto          # auto | imagen | grok | codex | imagen-scan
+backend: auto          # auto | imagen | gemini | grok | xai | codex | imagen-scan
+model: nano-banana-pro
 svg: false
 judge: true
 retries: 2

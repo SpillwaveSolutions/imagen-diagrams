@@ -2,10 +2,4 @@
 description: List built-in themes or extract a theme from a URL or image.
 ---
 
-Run `skills/imagen-diagrams/scripts/extract_theme.py`.
-
-- No args: list built-in themes and project themes.
-- `--url`: fetch the page, sample colors, write YAML plus a swatch.
-- `--image`: map the image onto the theme schema (model-assisted is allowed). The file must validate before use.
-
-Enforce contrast at least 4.5:1. Invalid YAML never reaches the worker.
+Load the imagen-diagrams skill and run extract_theme.py: no args lists themes, --url extracts a theme YAML. For an image, map its colors onto references/theme-schema.md yourself. Enforce contrast of at least 4.5:1. Invalid YAML never reaches the renderer.
