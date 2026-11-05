@@ -1,60 +1,24 @@
-# imagen-diagrams
+# imagen-diagrams (Spillwave portable edition)
 
-Illustration renderer for Mermaid and PlantUML. Not the diagram author.
+Turn Mermaid and PlantUML into themed slide and article figures.
 
-design-doc-mermaid writes Mermaid. plantuml writes leftover UML and Salt. This skill turns `.mmd` and `.puml` into a themed PNG. Optional SVG follows a passing judge.
+Built from [SpillwaveSolutions/imagen-diagrams](https://github.com/SpillwaveSolutions/imagen-diagrams) v0.3.0 and repackaged for Claude Desktop, Cowork, and claude.ai.
 
-Hosts: Claude Code, Codex, Grok Build, Cursor, SKILZ / Agent Plugins 1.0.
+## What changed from upstream
 
-## Built-in themes
+- Shares the image-gen engine: `imagen` CLI, `gemini-api` REST, `grok-img` CLI, `xai-api` REST, `codex`, with real failover. The upstream grok and codex argv did not match those CLIs.
+- Diagrams default to Nano Banana Pro for label accuracy.
+- Reads `.imagen-diagrams/config.yaml` (theme, backend, model, aspect, output_dir).
+- `to_svg.py` is now a working SVG gate: well-formed XML, no raster or script, size budget, label coverage, and a PNG preview via rsvg-convert or headless Chrome.
+- Code-drawn SVG path: when no image API is reachable (for example a claude.ai cloud session), Claude draws the themed figure as SVG and gates it, so you still get a figure.
+- `render.py --feedback` for judge-driven retries.
 
-- **claude-clay**: cream paper, clay, soft yellow, muted lavender, sage, ink arrows.
-- **manning-print**: white paper, black ink, four greys. Print-safe.
-- **agent-control**: white canvas, deep navy cards and arrows, an orange tool boundary, green repository target.
-- **arctic-fox**: white paper, deep navy ink, royal-blue emphasis, silver-grey surfaces.
-- **towards-ai**: warm paper, near-black ink, royal-blue emphasis. Towards AI brand palette.
+## Themes
 
-Add a theme as YAML under `skills/imagen-diagrams/themes/` or `.imagen-diagrams/themes/`. Extract a theme from a URL or an image.
+`claude-clay` (screen default), `manning-print` (print default), `agent-control`, `arctic-fox`, `towards-ai`.
 
-## Backend (auto)
+## Keys
 
-1. `imagen` CLI if it is on PATH. Brace policy: double `{` and `}`.
-2. Else `grok` CLI. Brace policy: no rewrite.
-3. Else `codex` CLI. Brace policy: no rewrite.
-4. Else fail closed. The prompt sidecar is still written.
+Same as image-gen: `GEMINI_API_KEY` and/or `XAI_API_KEY` in env or `~/.config/spillwave/image-keys.env`.
 
-Pin a backend in `.imagen-diagrams/config.yaml` if you do not want auto.
-
-## Install
-
-```text
-skilz install SpillwaveSolutions/imagen-diagrams
-```
-
-Claude Code / Grok Build from the documentation marketplace:
-
-```text
-/plugin marketplace add SpillwaveSolutions/spillwave-documentation-marketplace
-/plugin install imagen-diagrams@spillwave-documentation
-```
-
-Claude Code `/plugin` also loads this tree. Grok Build loads Claude plugins with zero extra config.
-
-## Commands
-
-- `/imagen-render` source to PNG
-- `/imagen-theme` extract or list themes
-- `/imagen-svg` translate a passing PNG
-- `/imagen-judge` score a PNG against source inventory
-
-Scripts live in `skills/imagen-diagrams/scripts/`. Course repos can call `tools/imagen-worker.sh` as a drop-in shim.
-
-## Publication contract
-
-When the user asks for article, deck, website, glossary, or publication figures, follow `skills/imagen-diagrams/references/publication-contract.md`.
-
-Hard writing rule: zero em dash characters. STE100 voice. One term per concept. Never publish source syntax as the figure.
-
-## Status
-
-v0.1.0 scaffold. Published at [SpillwaveSolutions/imagen-diagrams](https://github.com/SpillwaveSolutions/imagen-diagrams). Listed in [spillwave-documentation-marketplace](https://github.com/SpillwaveSolutions/spillwave-documentation-marketplace). Judge and theme extract are first-pass. Manning greys can be tightened from the book palette.
+MIT License.
