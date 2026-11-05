@@ -10,7 +10,7 @@
       "name": "imagen-diagrams",
       "source": "./",
       "description": "Mermaid and PlantUML to slide and article figures. Five built-in themes, judge, optional SVG.",
-      "version": "0.3.0"
+      "version": "1.1.0"
     }
   ]
 }
