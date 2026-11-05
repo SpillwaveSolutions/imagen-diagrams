@@ -55,6 +55,22 @@ def resolve_model(name: str | None, kind: str = "default") -> str:
     return name.strip()
 
 
+def is_google_model(name: str | None) -> bool:
+    """True for a Nano Banana alias or a Gemini/Imagen model id.
+
+    Only the imagen and gemini-api backends can use these. Other engines
+    (xAI, Codex, the grok agent) reject them.
+    """
+    if not name:
+        return False
+    raw = name.strip().lower()
+    if raw in MODELS:
+        return True
+    if any(raw in (s["id"].lower(), s["alias"].lower()) for s in MODELS.values()):
+        return True
+    return raw.startswith(("gemini-", "imagen-"))
+
+
 def model_table() -> str:
     lines = ["| Alias | Model ID | When |", "| --- | --- | --- |"]
     for key, spec in MODELS.items():

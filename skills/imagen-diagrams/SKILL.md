@@ -50,7 +50,7 @@ python3 "$SKILL/scripts/render.py" --source diagrams/flow.mmd \
   --topic "agent control loop" --theme claude-clay --density slide
 ```
 
-Backend order (auto): `imagen` CLI, `gemini-api` (REST, key only), `grok-img` CLI, `xai-api` (REST, key only), `codex`. Failures fall through. Diagrams default to Nano Banana Pro because labels must be exact. Exit codes: 0 ok, 2 no backend, 3 Salt, 4 worker wrote nothing, 5 network blocked.
+Backend order (auto): `imagen` CLI, `gemini-api` (REST, key only), `grok-img` CLI, `xai-api` (REST, key only), `grok` agent CLI (its `image_gen` tool), `codex`. Failures fall through. A Nano Banana model goes only to `imagen` and `gemini-api`. Other backends use their own default model unless `--model` names one of theirs. Diagrams default to Nano Banana Pro because labels must be exact. Exit codes: 0 ok, 2 no backend, 3 Salt, 4 worker wrote nothing, 5 network blocked.
 
 Keys and setup: load the `image-gen-setup` skill when it is installed, or tell the user to put `GEMINI_API_KEY=...` in `~/.config/spillwave/image-keys.env`. Never ask for a key in chat.
 

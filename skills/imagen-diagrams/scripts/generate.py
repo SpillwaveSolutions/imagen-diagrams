@@ -6,8 +6,9 @@ Backend order (auto):
 2. gemini-api if a Google key is configured (REST, no CLI). No brace rewrite.
 3. grok-img on PATH. Policy grok-imagine.
 4. xai-api if an xAI key is configured (REST, no CLI). No brace rewrite.
-5. codex on PATH. Policy grok-imagine.
-6. Else fail closed. Write <stem>_imagen.prompt.txt and exit 2.
+5. grok (xAI agent CLI) on PATH. Uses its image_gen tool. Policy grok-imagine.
+6. codex on PATH. Policy grok-imagine.
+7. Else fail closed. Write <stem>_imagen.prompt.txt and exit 2.
 
 Exit codes: 0 ok, 2 no backend, 4 worker wrote nothing, 5 network blocked.
 """
@@ -16,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -26,14 +28,86 @@ from backends import (
     argv_for,
     detect_backends,
     escape_for_backend,
+    grok_agent_argv,
     grok_img_argv,
     imagen_fallback_argv,
 )
-from models import DEFAULT_MODEL_ID, MODELS, resolve_model
+from models import DEFAULT_MODEL_ID, MODELS, is_google_model, resolve_model
 
 SCRIPTS = Path(__file__).resolve().parent
 GROK_IMG_DEFAULT_MODEL = "grok-imagine-image"
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
+GROK_SESSIONS = Path.home() / ".grok" / "sessions"
+
+
+def model_for_backend(name: str, model_arg: str | None, kind: str = "default") -> str | None:
+    """Return the model to pass to one backend, or None for the host default.
+
+    A Nano Banana alias or Gemini id goes only to imagen and gemini-api.
+    render.py always asks for nano-banana-pro, and other engines reject it.
+    """
+    if name in ("imagen", "gemini-api"):
+        return resolve_model(model_arg, kind=kind) or DEFAULT_MODEL_ID
+    own = None if is_google_model(model_arg) else model_arg
+    if name in ("grok-img", "xai-api"):
+        return own or GROK_IMG_DEFAULT_MODEL
+    return own  # codex, grok-agent: None means the CLI's configured default model
+
+
+def grok_session_id(stdout: str | None) -> str | None:
+    match = re.search(r'"sessionId"\s*:\s*"([^"]+)"', stdout or "")
+    return match.group(1) if match else None
+
+
+def newest_grok_image(session_id: str, root: Path = GROK_SESSIONS) -> Path | None:
+    """grok keeps image_gen output in <root>/<url-encoded cwd>/<session>/images/."""
+    found = [
+        path
+        for path in root.glob(f"*/{session_id}/images/*")
+        if path.suffix.lower() in IMAGE_EXTENSIONS
+    ]
+    return max(found, key=lambda path: path.stat().st_mtime) if found else None
+
+
+def save_as_png(src: Path, out: Path) -> bool:
+    """Copy a PNG, or convert another image type with Pillow, sips, or magick."""
+    if src.suffix.lower() == ".png":
+        shutil.copy2(src, out)
+        return True
+    try:
+        from PIL import Image
+
+        Image.open(src).save(out, "PNG")
+        return True
+    except Exception:  # Pillow missing or cannot read the file: try a CLI converter
+        pass
+    for cmd in (
+        ["sips", "-s", "format", "png", str(src), "--out", str(out)],
+        ["magick", str(src), str(out)],
+    ):
+        if shutil.which(cmd[0]):
+            subprocess.run(cmd, check=False, capture_output=True)
+            if out.exists():
+                return True
+    print(f"Made {src}, but found no PNG converter (Pillow, sips, or magick).", file=sys.stderr)
+    return False
+
+
+def run_grok_agent(resolved, prompt_file: Path, out: Path, model: str | None, dry_run: bool) -> int:
+    cmd = grok_agent_argv(resolved, str(prompt_file), str(out.parent.resolve()), model)
+    print(" ".join(cmd))
+    if dry_run:
+        return 0
+    proc = subprocess.run(cmd, check=False, capture_output=True, text=True)
+    session = grok_session_id(proc.stdout)
+    image = newest_grok_image(session) if session else None
+    if image is None:
+        diagnostics = ((proc.stdout or "") + (proc.stderr or "")).strip()
+        if diagnostics:
+            print(diagnostics[-2000:], file=sys.stderr)
+        print(f"grok-agent made no image (session {session}).", file=sys.stderr)
+        return proc.returncode or 4
+    return 0 if save_as_png(image, out) else 4
 
 
 def prompt_path_for(output: Path) -> Path:
@@ -74,6 +148,8 @@ def run_backend(
 ) -> int:
     if resolved.name in ("gemini-api", "xai-api"):
         return run_api_backend(resolved.name, prompt, out, aspect, model, dry_run)
+    if resolved.name == "grok-agent":
+        return run_grok_agent(resolved, prompt_file, out, model, dry_run)
     if resolved.name == "grok-img":
         stage = Path(tempfile.mkdtemp(prefix=f".{out.stem}.grok-img-", dir=out.parent))
         try:
@@ -200,6 +276,20 @@ def agent_prompt(engine: str, prompt: str, out: Path, aspect: str) -> str:
     )
 
 
+def grok_agent_prompt(prompt: str, aspect: str) -> str:
+    """The grok agent only calls image_gen. The caller collects the file."""
+    return "\n\n".join(
+        [
+            "Call your image_gen tool exactly once to create one finished image from the brief below.",
+            f"Aspect ratio: {aspect}.",
+            "Do not write files, run commands, or draw the image with code. "
+            "The caller collects the image from this session.",
+            "Image brief:",
+            prompt,
+        ]
+    )
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description="image-gen article image renderer")
     p.add_argument("--prompt", help="Image prompt text")
@@ -210,7 +300,7 @@ def main() -> int:
     p.add_argument("--backend", default="auto")
     p.add_argument(
         "--engine-hint",
-        choices=("auto", "imagen", "gemini", "grok", "xai", "codex"),
+        choices=("auto", "imagen", "gemini", "grok", "xai", "codex"),  # grok includes grok-agent
         default="auto",
         help="Prefer this image engine. In auto mode, failed workers fall through to the next installed engine.",
     )
@@ -283,7 +373,7 @@ def generate_image(
         )
         sidecar.write_text(json.dumps(sidecar_data, indent=2) + "\n", encoding="utf-8")
         print(
-            "No image backend available: no imagen, grok-img, or codex CLI on PATH "
+            "No image backend available: no imagen, grok-img, grok, or codex CLI on PATH "
             "and no GEMINI_API_KEY / GOOGLE_API_KEY / XAI_API_KEY configured. "
             f"Wrote prompt to {prompt_file}. Run check_setup.py for details.",
             file=sys.stderr,
@@ -293,22 +383,15 @@ def generate_image(
     last_code = 2
     for resolved in resolved_backends:
         policy = resolved.policy
-        worker_prompt = (
-            prompt
-            if resolved.name != "codex"
-            else agent_prompt(resolved.name, prompt, out, aspect)
-        )
+        if resolved.name == "codex":
+            worker_prompt = agent_prompt(resolved.name, prompt, out, aspect)
+        elif resolved.name == "grok-agent":
+            worker_prompt = grok_agent_prompt(prompt, aspect)
+        else:
+            worker_prompt = prompt
         escaped = escape_for_backend(worker_prompt, policy)
         prompt_file.write_text(escaped, encoding="utf-8")
-        model = (
-            resolve_model(model_arg, kind=kind)
-            if resolved.name in ("imagen", "gemini-api")
-            else model_arg
-        )
-        if resolved.name in ("imagen", "gemini-api") and not model:
-            model = DEFAULT_MODEL_ID
-        if resolved.name in ("grok-img", "xai-api") and not model:
-            model = GROK_IMG_DEFAULT_MODEL
+        model = model_for_backend(resolved.name, model_arg, kind)
         code = run_backend(
             resolved,
             escaped,

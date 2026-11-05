@@ -1,6 +1,6 @@
 {
   "name": "imagen-diagrams",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Turn Mermaid and PlantUML into themed slide and article figures. Image backend with failover, fidelity judge, and a code-drawn SVG path that works with no image API at all.",
   "author": {
     "name": "Rick Hightower",

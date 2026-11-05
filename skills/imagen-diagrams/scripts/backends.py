@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-BackendName = Literal["imagen", "gemini-api", "grok-img", "xai-api", "codex"]
+BackendName = Literal["imagen", "gemini-api", "grok-img", "xai-api", "grok-agent", "codex"]
 BracePolicy = Literal["imagen-cli-vars", "imagen-cli-scan", "grok-imagine"]
 
 POLICY_FOR: dict[str, BracePolicy] = {
@@ -22,10 +22,15 @@ POLICY_FOR: dict[str, BracePolicy] = {
     "gemini-api": "grok-imagine",
     "grok-img": "grok-imagine",
     "xai-api": "grok-imagine",
+    "grok-agent": "grok-imagine",
     "codex": "grok-imagine",
 }
 
-AUTO_ORDER: tuple[BackendName, ...] = ("imagen", "gemini-api", "grok-img", "xai-api", "codex")
+AUTO_ORDER: tuple[BackendName, ...] = (
+    "imagen", "gemini-api", "grok-img", "xai-api", "grok-agent", "codex"
+)
+# Backends whose binary name differs from the backend name.
+BINARY_FOR = {"grok-agent": "grok"}
 API_BACKENDS = ("gemini-api", "xai-api")
 
 
@@ -70,7 +75,7 @@ def _resolve_one(name: str, policy_key: str | None = None) -> ResolvedBackend | 
         if _api_available(name):
             return ResolvedBackend(name, POLICY_FOR[name], "rest")  # type: ignore[arg-type]
         return None
-    path = shutil.which(name)
+    path = shutil.which(BINARY_FOR.get(name, name))
     if not path:
         return None
     return ResolvedBackend(name, POLICY_FOR[policy_key or name], path)  # type: ignore[arg-type]
@@ -81,7 +86,8 @@ REQUEST_CHAINS: dict[str, tuple[tuple[str, str | None], ...]] = {
     "imagen-scan": (("imagen", "imagen-scan"),),
     "gemini": (("gemini-api", None),),
     "gemini-api": (("gemini-api", None),),
-    "grok": (("grok-img", None), ("xai-api", None)),
+    "grok": (("grok-img", None), ("xai-api", None), ("grok-agent", None)),
+    "grok-agent": (("grok-agent", None),),
     "grok-img": (("grok-img", None),),
     "xai": (("xai-api", None),),
     "xai-api": (("xai-api", None),),
@@ -170,6 +176,35 @@ def grok_img_argv(
         "1",
         "--output",
         output_dir,
+    ]
+    if model:
+        cmd.extend(["--model", model])
+    return cmd
+
+
+def grok_agent_argv(
+    backend: ResolvedBackend,
+    prompt_file: str,
+    cwd: str,
+    model: str | None = None,
+) -> list[str]:
+    """Headless run of the xAI `grok` agent CLI (Grok Build), for hosts with no grok-img.
+
+    Only the image_gen tool is allowed. The agent does not write files or run
+    commands. The caller collects the image from the grok session folder.
+    """
+    if backend.name != "grok-agent":
+        raise ValueError("grok_agent_argv requires a grok-agent backend")
+    cmd = [
+        backend.binary,
+        "--prompt-file",
+        prompt_file,
+        "--allow",
+        "image_gen",
+        "--output-format",
+        "json",
+        "--cwd",
+        cwd,
     ]
     if model:
         cmd.extend(["--model", model])

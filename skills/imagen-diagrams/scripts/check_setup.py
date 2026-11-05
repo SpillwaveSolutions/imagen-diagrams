@@ -40,9 +40,9 @@ def main() -> int:
     args = p.parse_args()
 
     report: dict[str, dict] = {}
-    for cli in ("imagen", "grok-img", "codex"):
+    for name, cli in (("imagen", "imagen"), ("grok-img", "grok-img"), ("grok-agent", "grok"), ("codex", "codex")):
         path = shutil.which(cli)
-        report[cli] = {"kind": "cli", "installed": bool(path), "path": path}
+        report[name] = {"kind": "cli", "installed": bool(path), "path": path}
     for name, finder in (("gemini-api", google_key), ("xai-api", xai_key)):
         key, where = finder()
         entry = {"kind": "rest", "key": where or "missing", "host": HOSTS[name]}
@@ -76,7 +76,7 @@ def main() -> int:
                 "  - Put GEMINI_API_KEY=... (and/or XAI_API_KEY=...) in\n"
                 "    ~/.config/spillwave/image-keys.env, or export it in the shell.\n"
                 "  - Install a CLI: pip install -U gemini-imagen  (imagen),\n"
-                "    npm install -g grok-image-cli  (grok-img), or codex.\n"
+                "    npm install -g grok-image-cli  (grok-img), the xAI grok CLI, or codex.\n"
                 "  - In a claude.ai cloud session, API hosts are blocked unless an\n"
                 "    org admin allows them; run from Claude Desktop/Cowork instead."
             )

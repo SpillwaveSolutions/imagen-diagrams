@@ -67,7 +67,7 @@ def main() -> int:
     p.add_argument("--topic", default="diagram")
     p.add_argument("--theme")
     p.add_argument("--density", choices=("slide", "article"), default="slide")
-    p.add_argument("--backend", default=None, help="auto|imagen|gemini|grok|xai|codex|imagen-scan")
+    p.add_argument("--backend", default=None, help="auto|imagen|gemini|grok|grok-agent|xai|codex|imagen-scan")
     p.add_argument("--model", default=None, help=f"default {DEFAULT_DIAGRAM_MODEL}")
     p.add_argument("--aspect")
     p.add_argument("--output-dir")
