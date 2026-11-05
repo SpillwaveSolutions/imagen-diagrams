@@ -59,7 +59,7 @@ def main() -> int:
 
     load_theme(args.theme)
     resolved = detect_backend(args.backend)
-    policy = resolved.policy if resolved else "imagen-cli-vars"
+    policy = resolved.policy if resolved else "imagen-cli-bracket"
     prompt = build_layout_hints_prompt(
         source=source,
         topic=args.topic,
