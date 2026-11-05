@@ -2,7 +2,7 @@
 """Generate an article image via auto image backend.
 
 Backend order (auto):
-1. imagen on PATH. Policy imagen-cli-vars.
+1. imagen on PATH. Policy imagen-cli-bracket.
 2. gemini-api if a Google key is configured (REST, no CLI). No brace rewrite.
 3. grok-img on PATH. Policy grok-imagine.
 4. xai-api if an xAI key is configured (REST, no CLI). No brace rewrite.
@@ -362,14 +362,14 @@ def generate_image(
         "aspect": aspect,
         "engine_hint": engine_hint,
         "backend": None,
-        "policy": "imagen-cli-vars",
+        "policy": "imagen-cli-bracket",
         "model": model_arg,
         "attempts": [],
     })
 
     if not resolved_backends:
         prompt_file.write_text(
-            escape_for_backend(prompt, "imagen-cli-vars"), encoding="utf-8"
+            escape_for_backend(prompt, "imagen-cli-bracket"), encoding="utf-8"
         )
         sidecar.write_text(json.dumps(sidecar_data, indent=2) + "\n", encoding="utf-8")
         print(

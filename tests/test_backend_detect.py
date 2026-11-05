@@ -26,7 +26,10 @@ class DetectTests(unittest.TestCase):
     def test_auto_prefers_imagen(self):
         resolved = self.detect({"imagen": "/usr/bin/imagen", "grok-img": "/usr/bin/grok-img"})
         self.assertEqual(resolved.name, "imagen")
-        self.assertEqual(resolved.policy, "imagen-cli-vars")
+        # Changed deliberately: the old default doubled braces, which the
+        # imagen CLI reads as a Jinja variable. See DefaultPolicyTests in
+        # test_brace_policy.py for the label that breaks under doubling.
+        self.assertEqual(resolved.policy, "imagen-cli-bracket")
 
     def test_auto_falls_to_grok_img(self):
         resolved = self.detect({"grok-img": "/usr/bin/grok-img", "codex": "/usr/bin/codex"})

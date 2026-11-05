@@ -14,11 +14,30 @@ from pathlib import Path
 from typing import Literal
 
 BackendName = Literal["imagen", "gemini-api", "grok-img", "xai-api", "grok-agent", "codex"]
-BracePolicy = Literal["imagen-cli-vars", "imagen-cli-scan", "grok-imagine"]
+BracePolicy = Literal[
+    "imagen-cli-vars",
+    "imagen-cli-scan",
+    "imagen-cli-bracket",
+    "grok-imagine",
+]
 
+# The imagen CLI templates its prompt with Jinja, on stdin as well as argv.
+# Doubling a brace therefore creates the very failure it is meant to prevent:
+# a mermaid label like `skill://{name}` becomes `{{name}}`, which Jinja reads as
+# a required variable, and the CLI exits with
+# "Missing required variables: name". Doubling only looks safe on labels that
+# are not valid identifiers, such as `{Where is your value?}`, which is why the
+# bug hides until one diagram uses a single plain word.
+#
+# Replacing every brace with a bracket is the default because it is the only
+# policy no input can defeat. Pairing braces is not enough: mermaid emits
+# `{{label}}` natively for a hexagon node, the inner pair matches first, and
+# `N{{x}}` becomes `N({x)}`, which still carries a brace. `imagen-scan` and
+# `imagen-vars` stay reachable for a caller who wants them.
 POLICY_FOR: dict[str, BracePolicy] = {
-    "imagen": "imagen-cli-vars",
+    "imagen": "imagen-cli-bracket",
     "imagen-scan": "imagen-cli-scan",
+    "imagen-vars": "imagen-cli-vars",
     "gemini-api": "grok-imagine",
     "grok-img": "grok-imagine",
     "xai-api": "grok-imagine",
@@ -44,6 +63,7 @@ class ResolvedBackend:
 def escape_for_backend(text: str, policy: BracePolicy) -> str:
     """Apply the brace policy for the chosen image worker.
 
+    imagen-cli-bracket  -> rewrite every { and } to [ and ] (default for imagen)
     imagen-cli-vars     -> double every { and } (gemini-imagen template vars)
     imagen-cli-scan     -> rewrite {token} to (token)
     grok-imagine        -> no brace rewrite
@@ -52,6 +72,12 @@ def escape_for_backend(text: str, policy: BracePolicy) -> str:
         return text.replace("{", "{{").replace("}", "}}")
     if policy == "imagen-cli-scan":
         return re.sub(r"\{([^}]*)\}", r"(\1)", text)
+    if policy == "imagen-cli-bracket":
+        # Unconditional, and that is the point. Any policy that pairs braces
+        # leaves a stray one on mermaid's native `{{hexagon}}`: the inner pair
+        # matches first and `N{{x}}` becomes `N({x)}`. A bracket cannot begin a
+        # Jinja construct, so no input can produce one.
+        return text.replace("{", "[").replace("}", "]")
     return text
 
 
@@ -84,6 +110,7 @@ def _resolve_one(name: str, policy_key: str | None = None) -> ResolvedBackend | 
 REQUEST_CHAINS: dict[str, tuple[tuple[str, str | None], ...]] = {
     "imagen": (("imagen", "imagen"), ("gemini-api", None)),
     "imagen-scan": (("imagen", "imagen-scan"),),
+    "imagen-vars": (("imagen", "imagen-vars"),),
     "gemini": (("gemini-api", None),),
     "gemini-api": (("gemini-api", None),),
     "grok": (("grok-img", None), ("xai-api", None), ("grok-agent", None)),
