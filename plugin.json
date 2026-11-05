@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "imagen-diagrams",
-  "version": "0.3.0",
+  "version": "1.1.0",
   "description": "Convert Mermaid and PlantUML into slide and article figures. Themes as YAML. Layout-hints prompt. Fidelity judge. Optional SVG. Claude Clay, Manning Print, Agent Control, Arctic Fox, and Towards AI built in.",
   "author": {
     "name": "Rick Hightower",
