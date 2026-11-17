@@ -27,6 +27,12 @@ class ModelRoutingTests(unittest.TestCase):
         argv = argv_for(backend, "p.txt", "out/fig.png", "4:3", model=None)
         self.assertNotIn("--model", argv)
 
+    def test_codex_argv_can_write_the_output(self):
+        backend = ResolvedBackend("codex", "grok-imagine", "/usr/bin/codex")
+        argv = argv_for(backend, "p.txt", "out/fig.png", "16:9", model=None)
+        self.assertIn("workspace-write", argv)
+        self.assertEqual(argv[argv.index("-s") + 1], "workspace-write")
+
     def test_codex_keeps_its_own_model(self):
         self.assertEqual(model_for_backend("codex", "gpt-5.5"), "gpt-5.5")
 

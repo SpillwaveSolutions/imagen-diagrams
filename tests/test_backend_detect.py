@@ -31,8 +31,13 @@ class DetectTests(unittest.TestCase):
         # test_brace_policy.py for the label that breaks under doubling.
         self.assertEqual(resolved.policy, "imagen-cli-bracket")
 
-    def test_auto_falls_to_grok_img(self):
+    def test_auto_prefers_codex_over_grok_img(self):
         resolved = self.detect({"grok-img": "/usr/bin/grok-img", "codex": "/usr/bin/codex"})
+        self.assertEqual(resolved.name, "codex")
+        self.assertEqual(resolved.policy, "grok-imagine")
+
+    def test_auto_falls_to_grok_img_without_codex(self):
+        resolved = self.detect({"grok-img": "/usr/bin/grok-img"})
         self.assertEqual(resolved.name, "grok-img")
         self.assertEqual(resolved.policy, "grok-imagine")
 

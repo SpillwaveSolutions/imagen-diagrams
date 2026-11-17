@@ -4,10 +4,10 @@
 Backend order (auto):
 1. imagen on PATH. Policy imagen-cli-bracket.
 2. gemini-api if a Google key is configured (REST, no CLI). No brace rewrite.
-3. grok-img on PATH. Policy grok-imagine.
-4. xai-api if an xAI key is configured (REST, no CLI). No brace rewrite.
-5. grok (xAI agent CLI) on PATH. Uses its image_gen tool. Policy grok-imagine.
-6. codex on PATH. Policy grok-imagine.
+3. codex on PATH, with a workspace-write sandbox. Policy grok-imagine.
+4. grok-img on PATH. Policy grok-imagine.
+5. xai-api if an xAI key is configured (REST, no CLI). No brace rewrite.
+6. grok (xAI agent CLI) on PATH. Uses its image_gen tool. Policy grok-imagine.
 7. Else fail closed. Write <stem>_imagen.prompt.txt and exit 2.
 
 Exit codes: 0 ok, 2 no backend, 4 worker wrote nothing, 5 network blocked.

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Render diagram source to a themed PNG via the shared image engine.
 
-Backend order (auto): imagen CLI, gemini-api (REST), grok-img CLI, xai-api
-(REST), codex. Each failed attempt falls through to the next. With no usable
+Backend order (auto): imagen CLI, gemini-api (REST), codex, grok-img CLI,
+xai-api (REST), grok agent. Each failed attempt falls through to the next. With no usable
 backend, the layout-hints prompt is still written and the script exits 2 so
 the agent can take the code-drawn SVG path.
 
