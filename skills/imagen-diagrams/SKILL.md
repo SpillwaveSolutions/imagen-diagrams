@@ -84,7 +84,7 @@ This is not a mermaid-cli export. It is a designed figure.
 
 - `<stem>_imagen.png`
 - optional `<stem>_imagen.svg`
-- `<stem>_imagen.json` sidecar with hash, theme, inventory, backend, model
+- `<stem>_imagen.json` sidecar with hash, theme, inventory, backend, engine, model. `backend` is the plugin backend that ran. `engine` (imagen, codex, or grok) is the engine that drew the image: the imagen CLI can hand a job to codex or grok.
 - `<stem>_imagen.prompt.txt`
 
 Never publish source syntax as the figure.
