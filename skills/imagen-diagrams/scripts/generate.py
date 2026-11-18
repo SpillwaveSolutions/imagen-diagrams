@@ -38,6 +38,29 @@ SCRIPTS = Path(__file__).resolve().parent
 GROK_IMG_DEFAULT_MODEL = "grok-imagine-image"
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 GROK_SESSIONS = Path.home() / ".grok" / "sessions"
+# The engine family that draws for each backend, as recorded in the sidecar.
+ENGINE_FOR = {
+    "imagen": "imagen",
+    "gemini-api": "imagen",
+    "codex": "codex",
+    "grok-img": "grok",
+    "xai-api": "grok",
+    "grok-agent": "grok",
+}
+
+
+def engine_from_imagen_output(text: str) -> str | None:
+    """The imagen CLI can hand a job to another engine and then prints
+    "imagen: generated via codex -> out.png". Return that engine family."""
+    m = re.search(r"generated via ([A-Za-z][\w-]*)", text or "")
+    if not m:
+        return None
+    name = m.group(1).lower()
+    if name.startswith(("grok", "xai")):
+        return "grok"
+    if name.startswith(("gemini", "google", "imagen", "nano")):
+        return "imagen"
+    return name
 
 
 def model_for_backend(name: str, model_arg: str | None, kind: str = "default") -> str | None:
@@ -145,7 +168,10 @@ def run_backend(
     aspect: str,
     model: str | None,
     dry_run: bool,
+    report: dict | None = None,
 ) -> int:
+    """Run one backend. When report is a dict, it gets the "engine" that drew
+    the image, if the backend says (the imagen CLI can fall back internally)."""
     if resolved.name in ("gemini-api", "xai-api"):
         return run_api_backend(resolved.name, prompt, out, aspect, model, dry_run)
     if resolved.name == "grok-agent":
@@ -186,16 +212,25 @@ def run_backend(
         return 0
     try:
         agent_host = resolved.name == "codex"
+        # imagen output is captured too, to read which engine drew the image.
+        capture = agent_host or resolved.name == "imagen"
         proc = subprocess.run(
             cmd,
             check=False,
             input=prompt if resolved.name == "codex" else None,
-            text=agent_host,
-            capture_output=agent_host,
+            text=capture,
+            capture_output=capture,
         )
     except FileNotFoundError:
         print(f"backend binary missing: {resolved.binary}", file=sys.stderr)
         return 2
+    if resolved.name == "imagen":
+        sys.stdout.write(proc.stdout or "")
+        sys.stderr.write(proc.stderr or "")
+        if report is not None and proc.returncode == 0:
+            engine = engine_from_imagen_output((proc.stdout or "") + (proc.stderr or ""))
+            if engine:
+                report["engine"] = engine
     if proc.returncode != 0:
         if agent_host:
             diagnostics = ((proc.stdout or "") + (proc.stderr or "")).strip()
@@ -362,6 +397,7 @@ def generate_image(
         "aspect": aspect,
         "engine_hint": engine_hint,
         "backend": None,
+        "engine": None,
         "policy": "imagen-cli-bracket",
         "model": model_arg,
         "attempts": [],
@@ -392,6 +428,7 @@ def generate_image(
         escaped = escape_for_backend(worker_prompt, policy)
         prompt_file.write_text(escaped, encoding="utf-8")
         model = model_for_backend(resolved.name, model_arg, kind)
+        report: dict = {}
         code = run_backend(
             resolved,
             escaped,
@@ -400,15 +437,19 @@ def generate_image(
             aspect,
             model,
             dry_run,
+            report=report,
         )
+        # backend: the plugin backend that ran. engine: the engine that drew.
+        engine = report.get("engine") or ENGINE_FOR.get(resolved.name, resolved.name)
         sidecar_data.update(
             {
                 "backend": resolved.name,
+                "engine": engine,
                 "policy": policy,
                 "model": model,
             }
         )
-        sidecar_data["attempts"].append({"backend": resolved.name, "exit_code": code})
+        sidecar_data["attempts"].append({"backend": resolved.name, "engine": engine, "exit_code": code})
         sidecar.write_text(json.dumps(sidecar_data, indent=2) + "\n", encoding="utf-8")
         if code == 0:
             return 0
