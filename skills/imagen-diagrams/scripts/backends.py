@@ -45,8 +45,10 @@ POLICY_FOR: dict[str, BracePolicy] = {
     "codex": "grok-imagine",
 }
 
+# Codex comes before the xAI engines: its native image tool draws cleaner text
+# and layouts than grok in side-by-side runs.
 AUTO_ORDER: tuple[BackendName, ...] = (
-    "imagen", "gemini-api", "grok-img", "xai-api", "grok-agent", "codex"
+    "imagen", "gemini-api", "codex", "grok-img", "xai-api", "grok-agent"
 )
 # Backends whose binary name differs from the backend name.
 BINARY_FOR = {"grok-agent": "grok"}
@@ -174,6 +176,10 @@ def argv_for(
         "exec",
         "--skip-git-repo-check",
         "--ephemeral",
+        # exec defaults to a read-only sandbox: codex draws the image but cannot
+        # save it to the output path, and generate.py reports "wrote nothing".
+        "-s",
+        "workspace-write",
         "--add-dir",
         str(Path(out_file).resolve().parent),
         "-",
